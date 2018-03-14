@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Homework</string>
+    <string name="title.homework">Homework</string>
+    <string name="title.homework.modify">Modify</string>
+    <string name="message.homework.deleted">Homework deleted</string>
+    <string name="homework.title.label">Title</string>
+    <string name="homework.date.label">Date</string>
+    <string name="homework.subject.label">Subject</string>
+    <string name="homework.finished.label">Finished</string>
+    <string name="error.title.required">Homework title is required</string>
+    <string name="error.subject.required">Homework subject is required</string>
+    <string name="message.homework.saved">Homework saved.</string>
+    <string name="message.homework.updated">Homework updated.</string>
+</resources>

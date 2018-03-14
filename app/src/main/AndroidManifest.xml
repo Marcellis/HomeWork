@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.johnvandenberg.homework">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name=".ui.homework.HomeworkActivity"
+            android:label="@string/title.homework">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.modify.HomeworkModifyActivity"
+            android:label="@string/title.homework.modify"
+            android:parentActivityName=".ui.homework.HomeworkActivity"/>
+
+        <provider
+            android:name=".data.provider.HomeworkProvider"
+            android:authorities="com.johnvandenberg.provider.homework"
+            android:exported="true"
+            android:multiprocess="true" />
+    </application>
+
+</manifest>
