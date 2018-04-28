@@ -16,7 +16,6 @@ import android.widget.Toast;
 import com.johnvandenberg.homework.R;
 import com.johnvandenberg.homework.data.HomeworkRepository;
 import com.johnvandenberg.homework.data.local.HomeworkContract;
-import com.johnvandenberg.homework.data.provider.HomeworkProvider;
 import com.johnvandenberg.homework.data.model.Homework;
 import com.johnvandenberg.homework.ui.modify.HomeworkModifyActivity;
 
@@ -38,6 +37,7 @@ public class HomeworkActivity extends AppCompatActivity implements LoaderManager
         RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
         itemAnimator.setAddDuration(200L);
         itemAnimator.setRemoveDuration(200L);
+
         // Setup the RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setAdapter(adapter);
