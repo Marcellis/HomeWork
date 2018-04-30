@@ -26,7 +26,7 @@
             android:parentActivityName=".ui.homework.HomeworkActivity"/>
 
         <provider
-            android:name=".data.provider.HomeworkProvider"
+            android:name=".database.provider.HomeworkProvider"
             android:authorities="com.johnvandenberg.provider.homework"
             android:exported="true"
             android:multiprocess="true" />
