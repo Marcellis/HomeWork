@@ -18,7 +18,7 @@ import com.johnvandenberg.homework.database.entity.Homework;
 public class HomeworkProvider extends ContentProvider {
 
     /** The authority of this content provider. */
-    public static final String AUTHORITY = "com.example.android.contentprovidersample.provider";
+    public static final String AUTHORITY = "com.johnvandenberg.homework";
 
     /** The URI for the Cheese table. */
     public static final Uri URI_HOMEWORK = Uri.parse( "content://" + AUTHORITY + "/" + Homework.TABLE_NAME );

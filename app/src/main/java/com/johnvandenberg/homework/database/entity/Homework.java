@@ -36,17 +36,12 @@ public class Homework {
 
     public Homework() {}
 
-    public Homework(Cursor cursor ) {
+    public Homework(Cursor cursor) {
         uid         = cursor.getLong(cursor.getColumnIndex( COLUMN_ID ));
         title       = cursor.getString(cursor.getColumnIndex( COLUMN_TITLE ));
         subject     = cursor.getString(cursor.getColumnIndex( COLUMN_SUBJECT ));
         date        = cursor.getString(cursor.getColumnIndex( COLUMN_DATE ));
         finished    = cursor.getInt(cursor.getColumnIndex( COLUMN_FINISHED ));
-
-        System.out.println("Homework from cursor");
-        System.out.println( uid );
-        System.out.println( title );
-        System.out.println( subject);
     }
 
     public Homework(String title, String subject, String date, boolean finished) {

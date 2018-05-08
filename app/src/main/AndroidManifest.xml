@@ -27,9 +27,25 @@
 
         <provider
             android:name=".database.provider.HomeworkProvider"
-            android:authorities="com.johnvandenberg.provider.homework"
+            android:authorities="com.johnvandenberg.homework"
             android:exported="true"
             android:multiprocess="true" />
-    </application>
 
+        <service
+            android:name=".widget.service.WidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <receiver
+            android:icon="@mipmap/ic_launcher"
+            android:label="Example Widget"
+            android:name=".widget.provider.WidgetProvider" >
+            <intent-filter >
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info" />
+        </receiver>
+    </application>
 </manifest>

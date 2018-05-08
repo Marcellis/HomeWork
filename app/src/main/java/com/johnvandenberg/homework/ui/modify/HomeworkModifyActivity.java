@@ -1,6 +1,8 @@
 package com.johnvandenberg.homework.ui.modify;
 
 import android.app.DatePickerDialog;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 import com.johnvandenberg.homework.R;
 import com.johnvandenberg.homework.database.AppDatabase;
 import com.johnvandenberg.homework.database.entity.Homework;
+import com.johnvandenberg.homework.widget.provider.WidgetProvider;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -196,6 +199,9 @@ public class HomeworkModifyActivity extends AppCompatActivity implements DatePic
                 @Override
                 public void run() {
                     AppDatabase.getInstance( getApplicationContext() ).homeworkDao().update( homework );
+
+                    // Trigger widget
+                    triggerWidgetUpdate();
                 }
             });
 
@@ -203,5 +209,13 @@ public class HomeworkModifyActivity extends AppCompatActivity implements DatePic
 
             finish();
         }
+    }
+
+    private void triggerWidgetUpdate() {
+        Intent intent = new Intent(this, WidgetProvider.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        int ids[] = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds( new ComponentName(getApplication(), WidgetProvider.class ) );
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,ids);
+        sendBroadcast(intent);
     }
 }
