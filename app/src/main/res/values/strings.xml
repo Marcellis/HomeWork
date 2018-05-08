@@ -11,4 +11,6 @@
     <string name="error.subject.required">Homework subject is required</string>
     <string name="message.homework.saved">Homework saved.</string>
     <string name="message.homework.updated">Homework updated.</string>
+    <string name="empty_string">No results</string>
+    <string name="reload">Reload</string>
 </resources>

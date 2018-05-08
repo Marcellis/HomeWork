@@ -1,11 +1,13 @@
 package com.johnvandenberg.homework.ui.modify;
 
 import android.app.DatePickerDialog;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
@@ -13,8 +15,9 @@ import android.widget.DatePicker;
 import android.widget.Toast;
 
 import com.johnvandenberg.homework.R;
-import com.johnvandenberg.homework.data.HomeworkRepository;
-import com.johnvandenberg.homework.data.model.Homework;
+import com.johnvandenberg.homework.database.AppDatabase;
+import com.johnvandenberg.homework.database.entity.Homework;
+import com.johnvandenberg.homework.widget.provider.WidgetProvider;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,12 +29,12 @@ import java.util.Objects;
 
 public class HomeworkModifyActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
-    private Homework homework;
     private TextInputEditText inputTitle;
     private TextInputEditText inputDate;
     private TextInputEditText inputSubject;
     private CheckBox checkBox;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+    private Homework homework;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,21 +73,43 @@ public class HomeworkModifyActivity extends AppCompatActivity implements DatePic
                     saveHomework();
                 }
             });
+
         } else {
             // We are updating an existing homework so start by retrieving it from the intent
-            homework = (Homework) getIntent().getSerializableExtra("homework");
-            // Set the values for the views
-            inputTitle.setText(homework.getTitle());
-            inputDate.setText(homework.getDate());
-            inputSubject.setText(homework.getSubject());
-            checkBox.setChecked(homework.isFinished());
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    updateHomework();
-                }
-            });
+            final long homeworkUid = getIntent().getLongExtra("homeworkUid", 0 );
+
+            if( homeworkUid > 0 ) {
+
+                AsyncTask.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        homework = AppDatabase.getInstance( getApplicationContext() ).homeworkDao().findByUid( homeworkUid );
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setVariablesFromHomework( homework );
+                            }
+                        });
+                    }
+                });
+
+                fab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        updateHomework();
+                    }
+                });
+            }
         }
+    }
+
+    private void setVariablesFromHomework( Homework homework ) {
+        // Set the values for the views
+        inputTitle.setText(homework.getTitle());
+        inputDate.setText(homework.getDate());
+        inputSubject.setText(homework.getSubject());
+        checkBox.setChecked(homework.isFinished());
     }
 
     @Override
@@ -131,10 +156,15 @@ public class HomeworkModifyActivity extends AppCompatActivity implements DatePic
         } else if (subject.isEmpty()) {
             inputSubject.setError(getString(R.string.error_subject_required));
         } else {
-            Homework game = new Homework(title, subject, date, finished);
+            final Homework homework = new Homework(title, subject, date, finished);
 
-            HomeworkRepository repository = new HomeworkRepository(getContentResolver());
-            repository.save(game);
+            // Insert the homework object in the database
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    AppDatabase.getInstance( getApplicationContext() ).homeworkDao().insertAll( homework );
+                }
+            });
 
             Toast.makeText(this, R.string.message_homework_saved, Toast.LENGTH_LONG).show();
 
@@ -164,12 +194,28 @@ public class HomeworkModifyActivity extends AppCompatActivity implements DatePic
             homework.setDate(date);
             homework.setFinished(finished);
 
-            HomeworkRepository repository = new HomeworkRepository(getContentResolver());
-            repository.update(homework);
+            // Update object in the database
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    AppDatabase.getInstance( getApplicationContext() ).homeworkDao().update( homework );
+
+                    // Trigger widget
+                    triggerWidgetUpdate();
+                }
+            });
 
             Toast.makeText(this, R.string.message_homework_updated, Toast.LENGTH_LONG).show();
 
             finish();
         }
+    }
+
+    private void triggerWidgetUpdate() {
+        Intent intent = new Intent(this, WidgetProvider.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        int ids[] = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds( new ComponentName(getApplication(), WidgetProvider.class ) );
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,ids);
+        sendBroadcast(intent);
     }
 }

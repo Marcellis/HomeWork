@@ -1,0 +1,6 @@
+
+build/android-profile
+.idea/libraries/
+.gradle
+.idea
+.idea/
