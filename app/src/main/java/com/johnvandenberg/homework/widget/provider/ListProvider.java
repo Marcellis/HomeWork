@@ -1,6 +1,5 @@
 package com.johnvandenberg.homework.widget.provider;
 
-import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -21,24 +20,35 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
     private static String TAG = "ListProvider";
     private ArrayList<Homework> homeworkList = new ArrayList<>();
     private Context context;
-    private int appWidgetId;
 
     public ListProvider(Context context, Intent intent) {
         Log.d( TAG, "ListProvider" );
         this.context = context;
-        this.appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
     }
 
     @Override
     public void onCreate() {
         Log.d( TAG, "onCreate" );
-        loadData();
     }
 
     @Override
     public void onDataSetChanged() {
         Log.d( TAG, "onDataSetChanged" );
-        loadData();
+
+        // Reset the list!
+        homeworkList.clear();
+
+        Uri uri = HomeworkProvider.URI_HOMEWORK;
+        String[] projection = {
+                Homework.COLUMN_ID,
+                Homework.COLUMN_TITLE,
+                Homework.COLUMN_DATE,
+                Homework.COLUMN_SUBJECT,
+                Homework.COLUMN_FINISHED,
+        };
+
+        Cursor cursor = context.getContentResolver().query( uri, projection, null, null, Homework.COLUMN_ID + " ASC" );
+        addCursorToList( cursor );
     }
 
     @Override
@@ -56,7 +66,8 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
     @Override
     public RemoteViews getViewAt(int position) {
         Log.d( TAG, "getViewAt" );
-        final RemoteViews remoteView = new RemoteViews(context.getPackageName(), R.layout.widget_list_item);
+
+        RemoteViews remoteView = new RemoteViews(context.getPackageName(), R.layout.widget_list_item);
 
         if( homeworkList.size() > 0 ) {
             remoteView.setTextViewText(R.id.title, homeworkList.get(position).getTitle());
@@ -93,39 +104,21 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
         return true;
     }
 
-    private void loadData() {
-        Log.d( TAG, "loadData" );
-
-        // Reset the list!
-        homeworkList.clear();
-
-        Uri uri = HomeworkProvider.URI_HOMEWORK;
-        String[] projection = {
-                Homework.COLUMN_ID,
-                Homework.COLUMN_TITLE,
-                Homework.COLUMN_DATE,
-                Homework.COLUMN_SUBJECT,
-                Homework.COLUMN_FINISHED,
-        };
-
-        String selection = null;
-        String[] selectionArgs = null;
-        String sortOrder = Homework.COLUMN_ID + " ASC";
-
-        Cursor cursor = context.getContentResolver().query( uri, projection, selection, selectionArgs, sortOrder );
-        addCursorToList( cursor );
-    }
-
     private void addCursorToList( Cursor cursor ) {
         Log.d( TAG, "addCursorToList" );
         if( cursor != null ) {
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToNext();
 
+
+                Log.d( TAG, "addCursorToList: "+ i );
+
                 homeworkList.add(new Homework(cursor));
             }
 
             cursor.close();
         }
+
+        Log.d( TAG, "Finished addCursorToList" );
     }
 }

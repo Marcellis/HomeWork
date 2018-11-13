@@ -163,6 +163,9 @@ public class HomeworkModifyActivity extends AppCompatActivity implements DatePic
                 @Override
                 public void run() {
                     AppDatabase.getInstance( getApplicationContext() ).homeworkDao().insertAll( homework );
+
+                    // Trigger widget
+                    triggerWidgetUpdate();
                 }
             });
 
