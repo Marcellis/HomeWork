@@ -1,7 +1,6 @@
 package com.johnvandenberg.homework.widget.provider;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
@@ -21,7 +20,7 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
     private ArrayList<Homework> homeworkList = new ArrayList<>();
     private Context context;
 
-    public ListProvider(Context context, Intent intent) {
+    public ListProvider(Context context) {
         Log.d( TAG, "ListProvider" );
         this.context = context;
     }
@@ -48,7 +47,18 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
         };
 
         Cursor cursor = context.getContentResolver().query( uri, projection, null, null, Homework.COLUMN_ID + " ASC" );
-        addCursorToList( cursor );
+
+        if( cursor != null ) {
+            for (int i = 0; i < cursor.getCount(); i++) {
+                cursor.moveToNext();
+
+                Log.d( TAG, "addCursorToList: "+ i );
+
+                homeworkList.add(new Homework(cursor));
+            }
+
+            cursor.close();
+        }
     }
 
     @Override
@@ -102,23 +112,5 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
     public boolean hasStableIds() {
         Log.d( TAG, "hasStableIds" );
         return true;
-    }
-
-    private void addCursorToList( Cursor cursor ) {
-        Log.d( TAG, "addCursorToList" );
-        if( cursor != null ) {
-            for (int i = 0; i < cursor.getCount(); i++) {
-                cursor.moveToNext();
-
-
-                Log.d( TAG, "addCursorToList: "+ i );
-
-                homeworkList.add(new Homework(cursor));
-            }
-
-            cursor.close();
-        }
-
-        Log.d( TAG, "Finished addCursorToList" );
     }
 }
